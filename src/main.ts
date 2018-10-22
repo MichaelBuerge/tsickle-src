@@ -31,6 +31,9 @@ export interface Settings {
 
   /** If true, log internal debug warnings to the console. */
   verbose?: boolean;
+
+  /** No types (emits ? in type annotations, no forward declarations). */
+  untyped?: boolean;
 }
 
 function usage() {
@@ -43,6 +46,7 @@ tsickle flags are:
   --externs=PATH        save generated Closure externs.js to PATH
   --typed               [experimental] attempt to provide Closure types instead of {?}
   --enableAutoQuoting   automatically apply quotes to property accesses
+  --untyped             No types (emits ? in type annotations, no forward declarations).
 `);
 }
 
@@ -71,6 +75,9 @@ function loadSettingsFromArgs(args: string[]): {settings: Settings, tscArgs: str
         break;
       case 'enableAutoQuoting':
         settings.enableAutoQuoting = true;
+        break;
+      case 'untyped':
+        settings.untyped = true;
         break;
       case '_':
         // This is part of the minimist API, and holds args after the '--'.
@@ -173,7 +180,7 @@ export function toClosureJS(
     transformTypesToClosure: true,
     typeBlackListPaths: new Set(),
     enableAutoQuoting: settings.enableAutoQuoting,
-    untyped: false,
+    untyped: settings.untyped,
     logWarning: (warning) => console.error(ts.formatDiagnostics([warning], compilerHost)),
     options,
     host: compilerHost,
